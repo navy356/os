@@ -4,6 +4,7 @@
         "stdlib.h": "c",
         "chrono": "c",
         "variant": "c",
-        "ratio": "c"
+        "ratio": "c",
+        "gdt.h": "c"
     }
 }

@@ -19,7 +19,7 @@ $(x86_64_c_object_files): build/x86_64/%.o : src/impl/x86_64/%.c
 
 $(x86_64_asm_object_files): build/x86_64/%.o : src/impl/x86_64/%.asm
 	mkdir -p $(dir $@) && \
-	nasm -f elf64 $(patsubst build/x86_64/%.o, src/impl/x86_64/%.asm, $@) -o $@
+	nasm -f elf64 $(patsubst build/x86_64/%.o, src/impl/x86_64/%.asm, $@) -o $@ -i src/impl/x86_64/boot/
 
 .PHONY: build
 build: $(kernel_object_files) $(x86_64_object_files)
