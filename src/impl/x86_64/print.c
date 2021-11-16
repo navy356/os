@@ -1,6 +1,8 @@
 #include "print.h"
 #include "constants.h"
+#include "math.h"
 
+#define HEX_TO_STRING_MAX 11
 struct Char
 {
     uint8_t character;
@@ -101,7 +103,7 @@ int print_charAt(char character, int x, int y)
 {
     if (character == '\n')
     {
-        x=print_newlineFor(x,y);
+        x = print_newlineFor(x, y);
         return x;
     }
 
@@ -130,11 +132,11 @@ void print_str(char *str)
 
 void print_strAt(char *str, int x, int y)
 {
-    if (x >= NUM_ROWS|| x<0)
+    if (x >= NUM_ROWS || x < 0)
     {
         return;
     }
-    if(y >= NUM_COLS|| y<0)
+    if (y >= NUM_COLS || y < 0)
     {
         return;
     }
@@ -147,7 +149,7 @@ void print_strAt(char *str, int x, int y)
             return;
         }
 
-        x=print_charAt(character, x, y);
+        x = print_charAt(character, x, y);
 
         y++;
 
@@ -157,9 +159,9 @@ void print_strAt(char *str, int x, int y)
             y = 0;
         }
 
-        if(character == '\n')
+        if (character == '\n')
         {
-            y=0;
+            y = 0;
         }
     }
 }
@@ -167,4 +169,22 @@ void print_strAt(char *str, int x, int y)
 void print_set_color(uint8_t foreground, uint8_t background)
 {
     color = foreground + (background << 4);
+}
+
+char hexToStringOutput[HEX_TO_STRING_MAX];
+
+char *hexToString(unsigned int num)
+{
+    int i;
+    hexToStringOutput[0] = '0';
+    hexToStringOutput[1] = 'x';
+    int len = hexLenHelper(num)+1;
+    char index[16] = {'0', '1', '2', '3', '4', '5','6','7','8','9','A','B','C','D','E', 'F'};
+    for(i=len; num>0; i--)
+    {
+        hexToStringOutput[i] = index[(num & (0xF)) ];
+        num = num>>4;
+    }
+    hexToStringOutput[len+1]=0;
+    return hexToStringOutput;
 }

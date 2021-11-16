@@ -8,5 +8,5 @@ struct Cursor
 };
 
 void move_cursor(int,int);
-int write(char *buf, unsigned int len);
+int write(char *buf);
 void init_io();

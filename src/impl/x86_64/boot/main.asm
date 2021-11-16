@@ -16,7 +16,18 @@ start:
 	lgdt [gdt64.pointer]
 	jmp gdt64.code_segment:long_mode_start
 
-	hlt
+.loop:
+
+	mov eax, 0x200000 ; 2MiB
+	mul ecx
+	or eax, 0b10000011 ; present, writable, huge page
+	mov [page_table_l2 + ecx * 8], eax
+
+	inc ecx ; increment counter
+	cmp ecx, 512 ; checks if the whole table is mapped
+	jne .loop ; if not, continue
+
+	ret
 
 check_multiboot:
 	cmp eax, 0x36d76289
@@ -70,18 +81,6 @@ setup_page_tables:
 	mov [page_table_l3], eax
 
 	mov ecx, 0 ; counter
-.loop:
-
-	mov eax, 0x200000 ; 2MiB
-	mul ecx
-	or eax, 0b10000011 ; present, writable, huge page
-	mov [page_table_l2 + ecx * 8], eax
-
-	inc ecx ; increment counter
-	cmp ecx, 512 ; checks if the whole table is mapped
-	jne .loop ; if not, continue
-
-	ret
 
 enable_paging:
 	; pass page table location to cpu

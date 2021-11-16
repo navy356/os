@@ -45,7 +45,7 @@ void move_cursor(int x, int y)
     cursor_ptr->y = y;
 }
 
-int write(char *buf, unsigned int len)
+int write(char *buf)
 {
     print_strAt(buf, cursor_ptr->x, cursor_ptr->y);
     for (size_t i = 0; 1; i++)
