@@ -7,17 +7,6 @@ section .text
 
 bits 32
 
-EnterProtectedMode:
-   call EnableA20
-   mov eax, cr0 
-   or al, 1       ; set PE (Protection Enable) bit in CR0 (Control Register 0)
-   mov cr0, eax
-   mov eax, [esp+4]  ; Get the pointer to the GDT, passed as a parameter.
-   lgdt [eax]        ; Load the new GDT pointer
-   jmp 0x08:gdt_flush
-
-bits 32 
-
 init_gdt:
    push    ebp 
    mov     ebp, esp
@@ -75,7 +64,7 @@ init_gdt:
    lea     eax, [ebx]  ;{data_26}
    sub     esp, 0xc
    push    eax ;{var_1c}  {data_26}
-   call    EnterProtectedMode;gdt_flush
+   call    gdt_flush;gdt_flush
    add     esp, 0x10
    nop     
    mov     ebx, dword [ebp-0x4]
@@ -132,26 +121,19 @@ gdt_set_gate:
    nop  
    pop eax  
    leave 
-   retn 
-
-EnableA20:
-	in al, 0x92
-	or al, 2
-	out 0x92, al
-	ret
-
-
-bits 64
+   retn
 
 gdt_flush:
+   mov eax, [esp+4]  ; Get the pointer to the GDT, passed as a parameter.
    cli
+   lgdt [eax] 
+bits 64
    mov ax, 0x10      ; 0x10 is the offset in the GDT to our data segment
    mov ds, ax        ; Load all data segment selectors
    mov es, ax
    mov fs, ax
    mov gs, ax
    mov ss, ax
-   mov rax,0x1338
    push 0x08
    push .flush
    retf

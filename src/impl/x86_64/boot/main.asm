@@ -17,14 +17,13 @@ start:
 	mov esp, stack_top
 
 	call check_multiboot
-
-	call init_gdt
 	call check_cpuid
 	call check_long_mode
 
 	call setup_page_tables
 	call enable_paging
-	hlt
+
+	call init_gdt
 	call Start64Bit
 
 	hlt

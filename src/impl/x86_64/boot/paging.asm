@@ -1,5 +1,8 @@
 global setup_page_tables
 global enable_paging
+global page_table_l4
+global page_table_l3
+global page_table_l2
 
 section .text
 bits 32
@@ -28,6 +31,9 @@ setup_page_tables:
 	ret
 
 enable_paging:
+	mov ebx, cr0
+    and ebx, ~(1 << 31)
+    mov cr0, ebx
 	; pass page table location to cpu
 	mov eax, page_table_l4
 	mov cr3, eax
@@ -35,6 +41,7 @@ enable_paging:
 	; enable PAE
 	mov eax, cr4
 	or eax, 1 << 5
+	or eax, 0x00000010
 	mov cr4, eax
 
 	; enable long mode

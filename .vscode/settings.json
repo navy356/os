@@ -5,6 +5,7 @@
         "chrono": "c",
         "variant": "c",
         "ratio": "c",
-        "gdt.h": "c"
+        "gdt.h": "c",
+        "random": "c"
     }
 }
