@@ -28,7 +28,7 @@ void print_str(char* string);
 int print_charAt(char character, int x, int y);
 int print_newlineFor(int x,int y);
 void print_newline();
-void clear_row(size_t row);
+void clear_row(int row);
 void print_set_color(uint8_t foreground, uint8_t background);
 void print_strAt(char * str,int x, int y);
 char *hexToString(unsigned int num);

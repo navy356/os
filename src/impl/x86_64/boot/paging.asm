@@ -1,6 +1,6 @@
 global setup_page_tables
 global enable_paging
-
+extern dss
 section .text
 bits 32
 setup_page_tables:
@@ -25,6 +25,19 @@ setup_page_tables:
 	cmp ecx, 512 ; checks if the whole table is mapped
 	jne .loop ; if not, continue
 
+	mov ecx,512
+
+	.loop2:
+
+	mov eax, 0xf0000000 ; 2MiB
+	mul ecx
+	or eax, 0b10000011 ; present, writable, huge page
+	mov [page_table_l2 + ecx * 8], eax
+
+	inc ecx ; increment counter
+	cmp ecx, 1024 ; checks if the whole table is mapped
+	jne .loop2 ; if not, continue
+
 	ret
 
 enable_paging:
@@ -43,18 +56,18 @@ enable_paging:
 	or eax, 1 << 8
 	wrmsr
 
-	; enable paging
+	; enable paging, protected mode
 	mov eax, cr0
-	or eax, 1 << 31
+	or eax, 1 << 31 | 1 << 0
 	mov cr0, eax
 
 	ret
 
 section .bss
-align 4096
+align 8192
 page_table_l4:
-	resb 4096
+	resb 8192
 page_table_l3:
-	resb 4096
+	resb 8192
 page_table_l2:
-	resb 4096
+	resb 8192

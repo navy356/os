@@ -4,12 +4,12 @@ SECTIONS
 {
 	. = 1M;
 
-	.boot :
+	.boot ALIGN (0x1000):
 	{
 		KEEP(*(.multiboot_header))
 	}
 
-	.text :
+	.text ALIGN (0x1000):
 	{
 		*(.text)
 	}
@@ -18,5 +18,19 @@ SECTIONS
 	{
 		_idt = .;
 		. = . + 0x1000;
+	}
+
+	.data ALIGN (0x1000):
+	{
+		dss = .;
+		*(.data)
+	}
+	
+	.bss ALIGN (0x1000) :
+	{
+			sbss = .;
+			*(COMMON)
+			*(.bss)
+			ebss = .;
 	}
 }

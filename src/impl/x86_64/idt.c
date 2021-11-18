@@ -27,11 +27,7 @@ void init_idt()
 
 void isr1_handler()
 {
+    write(hexToString(inb(0x60)));
     outb(0x20,0x20);
     outb(0xa0,0x20);
-    write('test');
-    return;
-    //write(hexToString(inb(0x60)));
-    //outb(0x20,0x20);
-    //outb(0xa0,0x20);
 }

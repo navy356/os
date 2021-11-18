@@ -19,13 +19,13 @@ section.text
     %endmacro
 
     %macro POPALL 0
-        pop rax
-        pop rcx
-        pop rdx
-        pop r8
-        pop r9
-        pop r10
         pop r11
+        pop r10
+        pop r9
+        pop r8
+        pop rdx 
+        pop rcx
+        pop rax
     %endmacro
 
 idtDescriptor:
@@ -34,22 +34,13 @@ idtDescriptor:
 
 isr1:
     PUSHALL
-    push rax
-    mov ax, 0x10  ; load the kernel data segment descriptor
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
     call isr1_handler
-    pop rax
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
     POPALL
     iretq
 
 LoadIDT:
+    PUSHALL
     lidt[idtDescriptor]
     sti
+    POPALL
     ret

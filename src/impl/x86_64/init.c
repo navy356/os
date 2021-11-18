@@ -4,5 +4,5 @@
 void init()
 {
     init_io();
-    //init_idt();
+    init_idt();
 }

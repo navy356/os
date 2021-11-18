@@ -2,6 +2,7 @@ GLOBAL gdt_flush    ; Allows the C code to call gdt_flush().
 extern kernel_main
 extern gdt_entries
 extern gdt_ptr
+extern Start64Bit
 global init_gdt
 section .text
 
@@ -14,7 +15,7 @@ EnterProtectedMode:
    mov cr0, eax
    mov eax, [esp+4]  ; Get the pointer to the GDT, passed as a parameter.
    lgdt [eax]        ; Load the new GDT pointer
-   jmp 0x08:gdt_flush
+   jmp gdt_flush
 
 bits 32 
 
@@ -140,9 +141,6 @@ EnableA20:
 	out 0x92, al
 	ret
 
-
-bits 64
-
 gdt_flush:
    cli
    mov ax, 0x10      ; 0x10 is the offset in the GDT to our data segment
@@ -151,10 +149,4 @@ gdt_flush:
    mov fs, ax
    mov gs, ax
    mov ss, ax
-   mov rax,0x1338
-   push 0x08
-   push .flush
-   retf
-
-.flush
-   ret
+   jmp 0x08:Start64Bit

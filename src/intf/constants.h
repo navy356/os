@@ -3,5 +3,5 @@
 #include <stdint.h>
 #include <stddef.h>
 
-const static size_t NUM_COLS = 80;
-const static size_t NUM_ROWS = 25;
+const static int NUM_COLS = 80;
+const static int NUM_ROWS = 25;
