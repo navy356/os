@@ -9,6 +9,8 @@ SECTIONS
 		KEEP(*(.multiboot_header))
 	}
 
+	
+
 	.text ALIGN (0x1000):
 	{
 		*(.text)
@@ -18,6 +20,11 @@ SECTIONS
 	{
 		_idt = .;
 		. = . + 0x1000;
+	}
+
+	.rodata ALIGN(0X1000):
+	{
+		*(.rodata)
 	}
 
 	.data ALIGN (0x1000):

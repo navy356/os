@@ -1,5 +1,5 @@
 global start
-
+global placement_address
 extern Start64Bit
 extern check_multiboot
 extern check_cpuid
@@ -76,3 +76,9 @@ GDT:
     .Pointer:
         dw $ - GDT - 1
         dq GDT
+
+
+section .bss
+align 4096
+placement_address:
+    resb 0x4000

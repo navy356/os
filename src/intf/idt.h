@@ -13,3 +13,5 @@ struct IDT{
 };
 
 void isr1_handler();
+void init_idt();
+void setIdtVal(int i,uint64_t offset, uint8_t ist, uint16_t offset_selector,uint8_t types_attr);
