@@ -12,6 +12,7 @@
 #define MOD_SHIFT (1 << 1)
 #define MOD_ALT   (1 << 2)
 
+#define KERNEL_OFFSET 0x40000000
 /* The modifier keys currently pressed */
 static unsigned char mod_keys = 0;
 /* Keycode definitions. */

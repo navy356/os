@@ -13,5 +13,5 @@ void kernel_main() {
     init();
     print_set_color(PRINT_COLOR_YELLOW, PRINT_COLOR_BLACK);
     print_clear();
-    write(hexToString(0x1337));
+    getPhysical(0x400113c5, pages);
 }
