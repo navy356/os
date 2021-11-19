@@ -1,18 +1,24 @@
-global setup_page_tables_2
-global enable_paging_2
+global edit_page_tables
+global enable_paging_edit
 global pages
 extern dss
+extern kernel_offset
 section .text
 bits 32
-setup_page_tables_2:
+edit_page_tables:
 	mov eax, page_table_3
+	sub eax, kernel_offset
 	or eax, 0b11 ; present, writable
 	mov ebx, page_table_4
-	mov [page_table_4], eax
+	sub ebx, kernel_offset
+	mov [ebx], eax
 	
-	mov eax, page_table_2
-	or eax, 0b11 ; present, writable
-	mov [page_table_3], eax
+	mov edx, page_table_2
+	sub edx, kernel_offset
+	or edx, 0b11 ; present, writable
+	mov eax,page_table_3
+	sub eax, kernel_offset
+	mov [eax+0x1*8], edx
 
 	mov ecx, 0 ; 
 
@@ -22,26 +28,20 @@ setup_page_tables_2:
 	mul ecx
 	or eax, 0b10000011 ; present, writable, huge page
 	mov edx, page_table_2
-	add edx, 0x80*8
+	sub edx, kernel_offset
 	mov [edx + ecx * 8], eax
 
 	inc ecx ; increment counter
-	cmp ecx, 384 ; checks if the whole table is mapped
+	cmp ecx, 512 ; checks if the whole table is mapped
 	jne .loop ; if not, continue
 
-	mov ecx,512
+	ret
 
-enable_paging_2:
+enable_paging_edit:
 	; pass page table location to cpu
 	mov eax, page_table_4
-	mov ebx,0x1337
+	sub eax, kernel_offset
 	mov cr3, eax
-	hlt
-
-	; enable paging, protected mode
-	mov eax, cr0
-	or eax, 1 << 31 | 1 << 0
-	mov cr0, eax
 
 	ret
 

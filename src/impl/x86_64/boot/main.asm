@@ -9,26 +9,21 @@ extern kernel_main
 extern kernel_offset
 extern gdt_entries
 extern error
-extern setup_page_tables_2
-extern enable_paging_2
+extern edit_page_tables
+extern enable_paging_edit
+extern page_table_4
 
 section .text
 bits 32
 _start:
 	mov esp, stack_top
 
-	;call check_multiboot
-
-	;call check_cpuid
-	;call check_long_mode
-
-	;call setup_page_tables_2
-    ;hlt
-	;call enable_paging
-
     mov eax,GDT.Pointer
     sub eax, kernel_offset
 	lgdt [eax]         ; Load the 64-bit global descriptor table.
+
+    call edit_page_tables
+    call enable_paging_edit
     jmp GDT.Code:Start64Bit
 
 	hlt

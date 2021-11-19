@@ -1,20 +1,8 @@
 global start
-global page_table_2
-global page_table_3
 global page_table_4
 extern _start
 
 extern kernel_offset
-extern Start64Bit
-extern check_multiboot
-extern check_cpuid
-extern check_long_mode
-extern init_gdt
-extern kernel_main
-extern gdt_entries
-extern error
-extern setup_page_tables_2
-extern enable_paging_2
 
 section .multiboot.text
 start:
@@ -59,17 +47,22 @@ setup_page_tables:
 	cmp ecx, 512 ; checks if the whole table is mapped
 	jne .loop ; if not, continue
 
-	mov ecx,512
+	mov ecx,0
 
-	mov eax,0
-	or eax, 0b10000011
+.loop2:
+
+	mov eax, 0x200000 ; 2MiB
+	mul ecx
+	;add eax, kernel_offset
+	or eax, 0b10000011 ; present, writable, huge page
 	mov edx, page_table_2_2
 	sub edx, kernel_offset
-	mov ecx,0x80
+	;0x80*8 = 1024
 	mov [edx + ecx * 8], eax
 
-	mov ecx, 0 ; counter
-	mov eax, kernel_offset
+	inc ecx ; increment counter
+	cmp ecx, 512 ; checks if the whole table is mapped
+	jne .loop2 ; if not, continue
 
 
 enable_paging:
@@ -107,6 +100,4 @@ page_table_3:
 page_table_2:
 	resb 4096
 page_table_2_2:
-	resb 4096
-page_table_1:
 	resb 4096

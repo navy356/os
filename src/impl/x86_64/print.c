@@ -8,7 +8,7 @@ struct Char
     uint8_t character;
     uint8_t color;
 };
-struct Char *buffer = (struct Char *)0xb8000;
+struct Char *buffer = (struct Char *)0x400b8000;
 int col = 0;
 int row = 0;
 uint8_t color = PRINT_COLOR_WHITE | PRINT_COLOR_BLACK << 4;
