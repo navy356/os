@@ -1,6 +1,9 @@
 global setup_page_tables
 global enable_paging
 global pages
+extern page_table_2
+extern page_table_3
+extern page_table_4
 extern dss
 section .text
 bits 32
@@ -50,15 +53,6 @@ enable_paging:
 	mov cr0, eax
 
 	ret
-
-section .bss
-align 4096
-page_table_4:
-	resb 4096
-page_table_3:
-	resb 4096
-page_table_2:
-	resb 4096
 
 section .data
 pages:

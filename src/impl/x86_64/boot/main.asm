@@ -1,4 +1,4 @@
-global start
+global _start
 global placement_address
 extern Start64Bit
 extern check_multiboot
@@ -13,7 +13,7 @@ extern enable_paging
 
 section .text
 bits 32
-start:
+_start:
 	mov esp, stack_top
 
 	call check_multiboot
@@ -21,8 +21,8 @@ start:
 	call check_cpuid
 	call check_long_mode
 
-	call setup_page_tables
-	call enable_paging
+	;call setup_page_tables
+	;call enable_paging
 
 	lgdt [GDT.Pointer]         ; Load the 64-bit global descriptor table.
     jmp GDT.Code:Start64Bit
