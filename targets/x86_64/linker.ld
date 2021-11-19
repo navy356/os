@@ -5,7 +5,7 @@ SECTIONS
 	. = 1M;
 
 	kernel_start = 0x10000;
-	kernel_offset = 0x10000000;
+	kernel_offset = 0x50000000;
 	. = kernel_start + kernel_offset;
 	.text ALIGN (0x1000): AT(ADDR(.text) - kernel_offset)
 	{
