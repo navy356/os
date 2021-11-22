@@ -31,4 +31,4 @@ void print_newline();
 void clear_row(int row);
 void print_set_color(uint8_t foreground, uint8_t background);
 void print_strAt(char * str,int x, int y);
-char *hexToString(unsigned int num);
+char *hexToString(uint64_t num);

@@ -12,6 +12,9 @@ edit_page_tables:
 	mov ebx, page_table_4
 	sub ebx, kernel_offset
 	mov [ebx], eax
+
+	;setting last entry in page table 3 as page table 4
+	mov [eax+0x1ff*8],ebx
 	
 	mov edx, page_table_2
 	sub edx, kernel_offset
@@ -19,6 +22,9 @@ edit_page_tables:
 	mov eax,page_table_3
 	sub eax, kernel_offset
 	mov [eax+0x1*8], edx
+
+	;setting last entry in page table 2 as page table 3
+	mov [edx+0x1ff*8],eax
 
 	mov ecx, 0 ; 
 

@@ -172,11 +172,15 @@ void print_set_color(uint8_t foreground, uint8_t background)
 
 char hexToStringOutput[HEX_TO_STRING_MAX];
 
-char *hexToString(unsigned int num)
+char *hexToString(uint64_t num)
 {
     int i;
     hexToStringOutput[0] = '0';
     hexToStringOutput[1] = 'x';
+    if(num == 0)
+    {
+        return "0x0";
+    }
     int len = hexLenHelper(num)+1;
     char index[16] = {'0', '1', '2', '3', '4', '5','6','7','8','9','A','B','C','D','E', 'F'};
     for(i=len; num>0; i--)
