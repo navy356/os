@@ -26,10 +26,22 @@ struct page_t {
     struct page_entry_t pages[512];
 };
 
+struct PageMap {
+    uint16_t page_4_offset : 9;
+    uint16_t page_3_offset : 9;
+    uint16_t page_2_offset : 9;
+    uint16_t page_1_offset : 9;
+}memMap;
 extern struct page_t * pages;
 
+struct PageMap * memMap_ptr;
 uint64_t getPhysical(uint64_t address);
 void init_paging();
-uint64_t getEntryAddress(struct page_t * page_table, uint8_t offset);
+uint64_t setEntryAddress(struct page_t *page_table, uint16_t offset, uint64_t address);
+uint64_t getEntryAddress(struct page_t * page_table, uint16_t offset);
 void page_fault();
+uint64_t mapPage(uint64_t physical_addr, uint64_t size);
+struct page_t * getPageTable();
 struct page_t *pages1;
+struct page_entry_t *getPageEntry(uint64_t entry);
+extern flush_cr3(struct page_t * addr);

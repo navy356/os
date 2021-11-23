@@ -3,6 +3,9 @@ global enable_paging_edit
 global pages
 extern dss
 extern kernel_offset
+extern kernel_end
+global kernel_end_virtual
+global flush_cr3
 section .text
 bits 32
 edit_page_tables:
@@ -12,9 +15,6 @@ edit_page_tables:
 	mov ebx, page_table_4
 	sub ebx, kernel_offset
 	mov [ebx], eax
-
-	;setting last entry in page table 3 as page table 4
-	mov [eax+0x1ff*8],ebx
 	
 	mov edx, page_table_2
 	sub edx, kernel_offset
@@ -22,9 +22,6 @@ edit_page_tables:
 	mov eax,page_table_3
 	sub eax, kernel_offset
 	mov [eax+0x1*8], edx
-
-	;setting last entry in page table 2 as page table 3
-	mov [edx+0x1ff*8],eax
 
 	mov ecx, 0 ; 
 
@@ -51,6 +48,19 @@ enable_paging_edit:
 
 	ret
 
+bits 64
+flush_cr3:
+	push rax
+	mov cr3,rdi
+	;bits 32
+	;mov eax, cr0
+	;or eax, 1 << 31 | 1 << 0
+	;mov cr0,eax
+	;bits 64
+	pop rax
+	ret
+
+bits 32
 section .bss
 align 4096
 page_table_4:
@@ -63,3 +73,5 @@ page_table_2:
 section .data
 pages:
 	dq page_table_4
+kernel_end_virtual:
+	dq kernel_end

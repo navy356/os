@@ -1,4 +1,6 @@
-int intLenHelper(unsigned x) {
+#include "math.h"
+#include <stdint.h>
+int intLenHelper(uint64_t x) {
     if (x >= 1000000000) return 10;
     if (x >= 100000000)  return 9;
     if (x >= 10000000)   return 8;
@@ -11,7 +13,9 @@ int intLenHelper(unsigned x) {
     return 1;
 }
 
-int hexLenHelper(unsigned x) {
+int hexLenHelper(uint64_t x) {
+    if (x > 0xFFFFFFFFF) return 10;
+    if (x > 0xFFFFFFFF) return 9;
     if (x > 0xFFFFFFF) return 8;
     if (x > 0xFFFFFF)  return 7;
     if (x > 0xFFFFF)   return 6;

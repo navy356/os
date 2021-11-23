@@ -1,13 +1,18 @@
 #include "kheap.h"
+#include "utility.h"
 
-uint32_t kmalloc(uint32_t sz)
+void init_kheap()
 {
-  uint32_t tmp = placement_address;
+  placement_address = kernel_end_virtual+1;
+}
+uint64_t kmalloc(uint64_t sz)
+{
+  uint64_t tmp = placement_address;
   placement_address += sz;
   return tmp;
 }
 
-uint32_t kmalloc_a(uint32_t sz, int align)
+uint64_t kmalloc_a(uint64_t sz, int align)
 {
   if (align == 1 && (placement_address & 0xFFFFF000)) // If the address is not already page-aligned
   {
@@ -15,12 +20,12 @@ uint32_t kmalloc_a(uint32_t sz, int align)
     placement_address &= 0xFFFFF000;
     placement_address += 0x1000;
   }
-  uint32_t tmp = placement_address;
+  uint64_t tmp = placement_address;
   placement_address += sz;
   return tmp;
 }
 
-uint32_t kmalloc_ap(uint32_t sz, int align, uint32_t *phys)
+uint64_t kmalloc_ap(uint64_t sz, int align, uint64_t *phys)
 {
   if (align == 1 && (placement_address & 0xFFFFF000)) // If the address is not already page-aligned
   {
@@ -30,7 +35,7 @@ uint32_t kmalloc_ap(uint32_t sz, int align, uint32_t *phys)
   }
   if (phys)
   {
-    *phys = placement_address;
+    *phys = getPhysicalKernelOffset(placement_address);
   }
   uint32_t tmp = placement_address;
   placement_address += sz;

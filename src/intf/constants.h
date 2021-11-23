@@ -13,6 +13,9 @@
 #define MOD_ALT   (1 << 2)
 
 #define KERNEL_OFFSET 0x40000000
+#define MAPPED_END 0x00003fdfffff
+
+extern uint64_t kernel_end_virtual;
 /* The modifier keys currently pressed */
 static unsigned char mod_keys = 0;
 /* Keycode definitions. */
