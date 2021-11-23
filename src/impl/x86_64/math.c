@@ -14,6 +14,12 @@ int intLenHelper(uint64_t x) {
 }
 
 int hexLenHelper(uint64_t x) {
+    if (x > 0xFFFFFFFFFFFFFFF) return 16;
+    if (x > 0xFFFFFFFFFFFFFF) return 15;
+    if (x > 0xFFFFFFFFFFFFF) return 14;
+    if (x > 0xFFFFFFFFFFFF) return 13;
+    if (x > 0xFFFFFFFFFFF) return 12;
+    if (x > 0xFFFFFFFFFF) return 11;
     if (x > 0xFFFFFFFFF) return 10;
     if (x > 0xFFFFFFFF) return 9;
     if (x > 0xFFFFFFF) return 8;

@@ -1,15 +1,19 @@
 #include "kheap.h"
 #include "utility.h"
+#include "paging.h"
+#include "print.h"
 
 void init_kheap()
 {
   placement_address = kernel_end_virtual+1;
 }
+
 uint64_t kmalloc(uint64_t sz)
 {
   uint64_t tmp = placement_address;
   placement_address += sz;
-  return tmp;
+  uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp),sz);
+  return v_addr;
 }
 
 uint64_t kmalloc_a(uint64_t sz, int align)
@@ -22,7 +26,8 @@ uint64_t kmalloc_a(uint64_t sz, int align)
   }
   uint64_t tmp = placement_address;
   placement_address += sz;
-  return tmp;
+  uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp),sz);
+  return v_addr;
 }
 
 uint64_t kmalloc_ap(uint64_t sz, int align, uint64_t *phys)

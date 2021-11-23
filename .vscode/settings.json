@@ -5,6 +5,16 @@
         "chrono": "c",
         "variant": "c",
         "ratio": "c",
-        "gdt.h": "c"
+        "gdt.h": "c",
+        "utility.h": "c",
+        "paging.h": "c",
+        "cstring": "c",
+        "string.h": "c",
+        "array": "cpp",
+        "hash_map": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp",
+        "valarray": "cpp"
     }
 }

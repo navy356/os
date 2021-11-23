@@ -31,6 +31,9 @@ build: $(kernel_object_files) $(x86_64_object_files)
 run: dist/x86_64/kernel.iso
 	qemu-system-x86_64 -cdrom dist/x86_64/kernel.iso
 
+debug: dist/x86_64/kernel.iso
+	bochs -f bochsrc.txt -q
+
 clean:
 	rm -f $(kernel_object_files)
 	rm -f $(x86_64_c_object_files)

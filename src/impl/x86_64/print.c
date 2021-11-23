@@ -2,7 +2,7 @@
 #include "constants.h"
 #include "math.h"
 
-#define HEX_TO_STRING_MAX 11
+#define HEX_TO_STRING_MAX 20
 struct Char
 {
     uint8_t character;

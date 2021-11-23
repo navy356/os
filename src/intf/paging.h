@@ -17,7 +17,8 @@
 #define OFFSET_2_MASK_PHYSICAL 0x3fe00000 //0x1ff<<21
 #define OFFSET_3_MASK_PHYSICAL 0x1ff000 //0x1ff<<12
 #define OFFSET_4_MASK_PHYSICAL 0x1ff
-
+#define SIGN_MASK_1 0xffff000000000000
+#define SIGN_MASK_0 0x0000000000000000
 struct page_entry_t {
     uint64_t entry;
 };
@@ -37,7 +38,6 @@ extern struct page_t * pages;
 struct PageMap * memMap_ptr;
 uint64_t getPhysical(uint64_t address);
 void init_paging();
-uint64_t setEntryAddress(struct page_t *page_table, uint16_t offset, uint64_t address);
 uint64_t getEntryAddress(struct page_t * page_table, uint16_t offset);
 void page_fault();
 uint64_t mapPage(uint64_t physical_addr, uint64_t size);
@@ -45,3 +45,5 @@ struct page_t * getPageTable();
 struct page_t *pages1;
 struct page_entry_t *getPageEntry(uint64_t entry);
 extern flush_cr3(struct page_t * addr);
+uint64_t virtual_addr_start;
+uint64_t setPhysicalFrame(uint64_t *page_table,uint16_t offset);

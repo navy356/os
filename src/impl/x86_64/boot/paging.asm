@@ -15,6 +15,10 @@ edit_page_tables:
 	mov ebx, page_table_4
 	sub ebx, kernel_offset
 	mov [ebx], eax
+
+	mov eax,ebx
+	or eax,0b11
+	mov [ebx+0x1ff*8],eax;recursive mapping for level 4 page table
 	
 	mov edx, page_table_2
 	sub edx, kernel_offset
@@ -52,11 +56,11 @@ bits 64
 flush_cr3:
 	push rax
 	mov cr3,rdi
-	;bits 32
-	;mov eax, cr0
-	;or eax, 1 << 31 | 1 << 0
-	;mov cr0,eax
-	;bits 64
+	bits 32
+	mov eax, cr0
+	or eax, 1 << 31 | 1 << 0
+	mov cr0,eax
+	bits 64
 	pop rax
 	ret
 

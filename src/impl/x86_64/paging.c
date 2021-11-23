@@ -7,43 +7,10 @@
 #include "kheap.h"
 void init_paging()
 {
-    memMap_ptr = &memMap;
-    memMap_ptr->page_4_offset = 1;
-    memMap_ptr->page_3_offset = 0;
-    memMap_ptr->page_2_offset = 0;
-    memMap_ptr->page_1_offset = 0;
+    virtual_addr_start = 0x0000008000000000;
 }
 
-void fixMap(int count)
-{
-    while (count > 0)
-    {
-        memMap_ptr->page_1_offset+=1;
-        count-=1;
-        if (memMap_ptr->page_1_offset >= 512)
-        {
-            memMap_ptr->page_1_offset = 0;
-            memMap_ptr->page_2_offset += 1;
-            if (memMap_ptr->page_2_offset >= 512)
-            {
-                memMap_ptr->page_2_offset = 0;
-                memMap_ptr->page_3_offset += 1;
-                if (memMap_ptr->page_3_offset >= 512)
-                {
-                    memMap_ptr->page_3_offset = 0;
-                    memMap_ptr->page_4_offset += 1;
-                    if (memMap_ptr->page_4_offset >= 512)
-                    {
-                        write("Memory full\n");
-                        asm("hlt");
-                    }
-                }
-            }
-        }
-    }
-}
-
-struct page_t * getPageTable()
+struct page_t *getPageTable()
 {
     uint64_t physicalAddr = 0;
     uint64_t virtualAddr = kmalloc_ap(0x1000, 1, &physicalAddr);
@@ -117,105 +84,54 @@ uint64_t mapPage(uint64_t physical_addr, uint64_t size)
 {
     struct page_t *page_table = pages;
 
-    uint64_t o4 = (uint64_t)memMap_ptr->page_4_offset;
-    uint64_t o3 = (uint64_t)memMap_ptr->page_3_offset;
-    uint64_t o2 = (uint64_t)memMap_ptr->page_2_offset;
-    uint64_t virtual_addr = (o4<<39)+(o3<<30)+(o2<<21);
-
     int pages_needed = 0;
+    if (size < 0x1000)
+    {
+        pages_needed = 1;
+        size = 0;
+    }
     while (size > 0)
     {
         pages_needed += 1;
         size -= 0x1000;
     }
 
-    if (pages_needed >= 512)
-    {
-        virtual_addr = virtual_addr+(physical_addr&OFFSET_3_MASK_PHYSICAL)+(physical_addr&OFFSET_4_MASK_PHYSICAL);
-    }
-    else
-    {
-        virtual_addr = virtual_addr+memMap_ptr->page_1_offset+(physical_addr&OFFSET_4_MASK_PHYSICAL);
-    }
-
-    write(hexToString(pages_needed));
-    write("\n");
-    write(hexToString(virtual_addr));
-    write("\n");
+    uint64_t virtual_addr = virtual_addr_start;
 
     while (pages_needed > 0)
     {
-        if (pages_needed >= 512)
-        { //assumption we never free these
-            uint64_t entry_pt3 = getEntryAddress(page_table, memMap_ptr->page_4_offset);
-            if (entry_pt3 == -1)
-            {
-                entry_pt3 = (uint64_t)getPageTable();
-                setEntryAddress((struct page_t *)page_table, memMap_ptr->page_4_offset, entry_pt3|0b11);
-            }
-            uint64_t entry_pt2 = getEntryAddress((struct page_t *)getVirtualKernelOffset(entry_pt3), memMap_ptr->page_3_offset);
-            if (entry_pt2 == -1)
-            {
-                entry_pt2 = (uint64_t)getPageTable();
-                setEntryAddress((struct page_t *)getVirtualKernelOffset(entry_pt3), memMap_ptr->page_3_offset, entry_pt2|0b11);
-            }
-            //fix mask
-            uint64_t entry = 0xFFE00000 & physical_addr;
-            entry = entry | 0b10000011;
-            uint64_t entry_pt1 = (uint64_t)entry;
-            setEntryAddress((struct page_t *)getVirtualKernelOffset(entry_pt2), memMap_ptr->page_1_offset, entry_pt1);
-            pages_needed -= 512;
-            physical_addr = physical_addr + 0x200000;
-            fixMap(512);
-            write(hexToString(memMap_ptr->page_1_offset));
-            write("\n");
-            write(hexToString(memMap_ptr->page_2_offset));
-            write("\n");
-            write(hexToString(memMap_ptr->page_3_offset));
-            write("\n");
-            write(hexToString(memMap_ptr->page_4_offset));
-            write("\n");
-        }
-        else
-        {
-            uint64_t entry_pt3 = getEntryAddress((struct page_t *)page_table, memMap_ptr->page_4_offset);
-            if (entry_pt3 == -1)
-            {
-                entry_pt3 = (uint64_t)getPageTable();
-                setEntryAddress((struct page_t *)page_table, memMap_ptr->page_4_offset, entry_pt3|0b11);
-            }
-            uint64_t entry_pt2 = getEntryAddress((struct page_t *)getVirtualKernelOffset(entry_pt3), memMap_ptr->page_3_offset);
-            if (entry_pt2 == -1)
-            {
-                entry_pt2 = (uint64_t)getPageTable();
-                setEntryAddress((struct page_t *)getVirtualKernelOffset(entry_pt3), memMap_ptr->page_3_offset, entry_pt2|0b11);
-            }
-            uint64_t entry_pt1 = getEntryAddress((struct page_t *)getVirtualKernelOffset(entry_pt2), memMap_ptr->page_2_offset);
-            if (entry_pt1 == -1)
-            {
-                entry_pt1 = (uint64_t)getPageTable();
-                setEntryAddress((struct page_t *)getVirtualKernelOffset(entry_pt2), memMap_ptr->page_2_offset, entry_pt1|0b11);
-            }
-            uint64_t entry = 0xFFFFF000 & physical_addr;
-            entry = entry | 0b11;
-            uint64_t entry_pt0 = (uint64_t)entry;
-            setEntryAddress((struct page_t *)getVirtualKernelOffset(entry_pt1), memMap_ptr->page_1_offset, entry_pt0);
-            pages_needed -= 1;
-            physical_addr = physical_addr + 0x1000;
-            fixMap(1);
-        }
+
+        uint16_t offset_level_4 = (virtual_addr_start & OFFSET_0_MASK_PHYSICAL) >> 39;
+        uint16_t offset_level_3 = (virtual_addr_start & OFFSET_1_MASK_PHYSICAL) >> 30;
+        uint16_t offset_level_2 = (virtual_addr_start & OFFSET_2_MASK_PHYSICAL) >> 21;
+        uint16_t offset_level_1 = (virtual_addr_start & OFFSET_3_MASK_PHYSICAL) >> 12;
+        uint16_t offset_physical = (physical_addr & OFFSET_4_MASK_PHYSICAL);
+        uint16_t recursive_offset = 0x1ff;
+
+        uint64_t sign;
+        sign = virtual_addr | SIGN_MASK_1;
+        sign = sign & SIGN_MASK_1;
+
+        //level 1 table entry
+        uint64_t *lv1 = sign + (((uint64_t)recursive_offset << 39)) + (((uint64_t)offset_level_4 << 30)) + ((uint64_t)(offset_level_3 << 21)) + (((uint64_t)offset_level_2 << 12)) + (((uint64_t)offset_level_1 * 8));
+        uint64_t *lv2 = sign + ((uint64_t)recursive_offset << 39) + ((uint64_t)recursive_offset << 30) + ((uint64_t)offset_level_4 << 21) + ((uint64_t)offset_level_3 << 12) + ((uint64_t)offset_level_2 * 8);
+        uint64_t *lv3 = sign + ((uint64_t)recursive_offset << 39) + ((uint64_t)recursive_offset << 30) + ((uint64_t)recursive_offset << 21) + ((uint64_t)offset_level_4 << 12) + ((uint64_t)offset_level_3 * 8);
+        uint64_t *lv4 = sign + (((uint64_t)recursive_offset << 39)) + (((uint64_t)recursive_offset << 30)) + (((uint64_t)recursive_offset << 21)) + (((uint64_t)recursive_offset << 12)) + ((uint64_t)offset_level_4 * 8);
+
+        setPhysicalFrame(lv4, 0);
+        setPhysicalFrame(lv3, 0);
+        setPhysicalFrame(lv2, 0);
+        *lv1 = (physical_addr & 0xFFFFF000) | 0b11;
+        physical_addr += 0x1000;
+        virtual_addr_start += 0x1000;
+        pages_needed -= 1;
     }
 
     flush_cr3(getPhysicalKernelOffset(page_table));
-    
 
     return virtual_addr;
 }
 
-uint64_t setEntryAddress(struct page_t *page_table, uint16_t offset, uint64_t address)
-{
-    page_table->pages[offset].entry = address;
-}
 uint64_t getEntryAddress(struct page_t *page_table, uint16_t offset)
 {
     struct page_entry_t page_entry = page_table->pages[offset];
@@ -230,22 +146,22 @@ uint64_t getEntryAddress(struct page_t *page_table, uint16_t offset)
     }
 }
 
+uint64_t setPhysicalFrame(uint64_t *page_table, uint16_t offset)
+{
+    uint64_t physical = *((uint64_t *)page_table);
+
+    if ((physical & PRESENT_MASK) == 0)
+    {
+        kmalloc_ap(0x1000, 1, &physical);
+        *page_table = physical | 0b11;
+    }
+    return physical;
+}
+
 void page_fault()
 {
     // A page fault has occurred.
 
     // Output an error message.
     write("Page fault! :( ");
-}
-
-struct page_entry_t *getPageEntry(uint64_t entry)
-{
-    uint64_t physicalAddr = 0;
-    uint64_t virtualAddr = kmalloc_ap(sizeof(struct page_entry_t), 1, &physicalAddr);
-    write(hexToString(virtualAddr));
-    write("\n");
-    struct page_entry_t *pe = (struct page_entry_t *)virtualAddr;
-    
-    pe->entry = entry;
-    return pe;
 }
