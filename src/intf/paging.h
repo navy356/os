@@ -44,6 +44,6 @@ uint64_t mapPage(uint64_t physical_addr, uint64_t size);
 struct page_t * getPageTable();
 struct page_t *pages1;
 struct page_entry_t *getPageEntry(uint64_t entry);
-extern flush_cr3(struct page_t * addr);
+extern void flush_cr3(struct page_t * addr);
 uint64_t virtual_addr_start;
 uint64_t setPhysicalFrame(uint64_t *page_table,uint16_t offset);

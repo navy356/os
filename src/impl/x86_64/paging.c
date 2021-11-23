@@ -113,21 +113,21 @@ uint64_t mapPage(uint64_t physical_addr, uint64_t size)
         sign = sign & SIGN_MASK_1;
 
         //level 1 table entry
-        uint64_t *lv1 = sign + (((uint64_t)recursive_offset << 39)) + (((uint64_t)offset_level_4 << 30)) + ((uint64_t)(offset_level_3 << 21)) + (((uint64_t)offset_level_2 << 12)) + (((uint64_t)offset_level_1 * 8));
-        uint64_t *lv2 = sign + ((uint64_t)recursive_offset << 39) + ((uint64_t)recursive_offset << 30) + ((uint64_t)offset_level_4 << 21) + ((uint64_t)offset_level_3 << 12) + ((uint64_t)offset_level_2 * 8);
-        uint64_t *lv3 = sign + ((uint64_t)recursive_offset << 39) + ((uint64_t)recursive_offset << 30) + ((uint64_t)recursive_offset << 21) + ((uint64_t)offset_level_4 << 12) + ((uint64_t)offset_level_3 * 8);
-        uint64_t *lv4 = sign + (((uint64_t)recursive_offset << 39)) + (((uint64_t)recursive_offset << 30)) + (((uint64_t)recursive_offset << 21)) + (((uint64_t)recursive_offset << 12)) + ((uint64_t)offset_level_4 * 8);
+        uint64_t *lv1 = (uint64_t *)(sign + (((uint64_t)recursive_offset << 39)) + (((uint64_t)offset_level_4 << 30)) + ((uint64_t)(offset_level_3 << 21)) + (((uint64_t)offset_level_2 << 12)) + (((uint64_t)offset_level_1 * 8)));
+        uint64_t *lv2 = (uint64_t *)(sign + ((uint64_t)recursive_offset << 39) + ((uint64_t)recursive_offset << 30) + ((uint64_t)offset_level_4 << 21) + ((uint64_t)offset_level_3 << 12) + ((uint64_t)offset_level_2 * 8));
+        uint64_t *lv3 = (uint64_t *)(sign + ((uint64_t)recursive_offset << 39) + ((uint64_t)recursive_offset << 30) + ((uint64_t)recursive_offset << 21) + ((uint64_t)offset_level_4 << 12) + ((uint64_t)offset_level_3 * 8));
+        uint64_t *lv4 = (uint64_t *)(sign + (((uint64_t)recursive_offset << 39)) + (((uint64_t)recursive_offset << 30)) + (((uint64_t)recursive_offset << 21)) + (((uint64_t)recursive_offset << 12)) + ((uint64_t)offset_level_4 * 8));
 
         setPhysicalFrame(lv4, 0);
         setPhysicalFrame(lv3, 0);
         setPhysicalFrame(lv2, 0);
-        *lv1 = (physical_addr & 0xFFFFF000) | 0b11;
+        *lv1 = (physical_addr & 0xFFFFFFFFFFFFF000) | 0b11;
         physical_addr += 0x1000;
         virtual_addr_start += 0x1000;
         pages_needed -= 1;
     }
 
-    flush_cr3(getPhysicalKernelOffset(page_table));
+    flush_cr3((struct page_t *)getPhysicalKernelOffset((uint64_t)page_table));
 
     return virtual_addr;
 }

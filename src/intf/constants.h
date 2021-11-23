@@ -294,7 +294,7 @@ enum KEYCODE {  //In this project we CAN'T PRINT ALL OF THIS. Can you fix it? :)
 	KEY_LEFTCURL          = '{',
 	KEY_RIGHTCURL         = '}',
 	KEY_DOLLAR            = '$',
-	KEY_POUND             = '£',
+	KEY_POUND             = ' ',//'£',
 	KEY_EURO              = '$',
 	KEY_LESS              = '<',
 	KEY_GREATER           = '>',

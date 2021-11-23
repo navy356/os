@@ -15,18 +15,16 @@ void kernel_main()
 {
     init();
     print_set_color(PRINT_COLOR_YELLOW, PRINT_COLOR_BLACK);
+    move_cursor(0,0);
     print_clear();
-    asm("hlt");
-    uint64_t a = kmalloc(8);
-    asm("hlt");
-    uint64_t b = kmalloc(8);
-    uint64_t c = kmalloc(8);
-    write("a: ");
+    write("I work");
+    uint64_t a = malloc(0x8,1);
+    uint64_t b = malloc(0x8,1);
     write(hexToString(a));
-    write(", b: ");
     write(hexToString(b));
-    write("\nc: ");
-    write(hexToString(c));
+    free(a);
+    write(hexToString(malloc(0x8+0x8,1)));
+    asm("hlt");
 
     /*kfree(c);
     kfree(b);
