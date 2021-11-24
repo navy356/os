@@ -240,10 +240,6 @@ void free(void *mem)
 uint64_t kmalloc(uint64_t sz)
 {
   uint64_t tmp = malloc(sz, 0);
-  write(hexToString(tmp));
-  write("\n");
-  write(hexToString(getPhysicalKernelOffset((uint64_t)tmp)));
-  write("\n");
   uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp), sz);
   return v_addr;
 }
