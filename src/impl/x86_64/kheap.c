@@ -45,9 +45,9 @@ static int memory_chunk_slot(size_t size)
 
 void init_memory(void *mem, size_t size)
 {
-  char *mem_start = (char *)((((intptr_t)mem) & PAGE_ALIGN) + (~PAGE_ALIGN+1));
-  char *mem_end = (char *)((((intptr_t)mem + size) & PAGE_ALIGN) + (~PAGE_ALIGN+1));
-  
+  char *mem_start = (char *)((((intptr_t)mem) & PAGE_ALIGN) + (~PAGE_ALIGN + 1));
+  char *mem_end = (char *)((((intptr_t)mem + size) & PAGE_ALIGN) + (~PAGE_ALIGN + 1));
+
   first = (Chunk *)mem_start;
   Chunk *second = first + 1;
   last = ((Chunk *)mem_end) - 1;
@@ -78,33 +78,114 @@ void *malloc(size_t size, int align)
   if (n >= NUM_SIZES)
     return NULL;
 
-  while (!free_chunk[n])
+  Chunk *chunk;
+  size_t size2;
+  size_t len;
+  if (!align)
   {
-    ++n;
-    if (n >= NUM_SIZES)
-      return NULL;
+    while (!free_chunk[n])
+    {
+      ++n;
+      if (n >= NUM_SIZES)
+        return NULL;
+    }
+
+    chunk = DLIST_POP(&free_chunk[n], free);
+    size2 = memory_chunk_size(chunk);
+    len = 0;
+
+    if (size + sizeof(Chunk) <= size2)
+    {
+      Chunk *chunk2 = (Chunk *)(((char *)chunk) + HEADER_SIZE + size);
+      memory_chunk_init(chunk2);
+      dlist_insert_after(&chunk->all, &chunk2->all);
+      len = memory_chunk_size(chunk2);
+      int n = memory_chunk_slot(len);
+      DLIST_PUSH(&free_chunk[n], chunk2, free);
+      mem_meta += HEADER_SIZE;
+      mem_free += len - HEADER_SIZE;
+    }
   }
-
-  Chunk *chunk = DLIST_POP(&free_chunk[n], free);
-  size_t size2 = memory_chunk_size(chunk);
-  size_t len = 0;
-
-  if (size + sizeof(Chunk) <= size2)
+  else
   {
-    Chunk *chunk2 = (Chunk *)(((char *)chunk) + HEADER_SIZE + size);
-    memory_chunk_init(chunk2);
-    dlist_insert_after(&chunk->all, &chunk2->all);
-    len = memory_chunk_size(chunk2);
-    int n = memory_chunk_slot(len);
-    DLIST_PUSH(&free_chunk[n], chunk2, free);
-    mem_meta += HEADER_SIZE;
-    mem_free += len - HEADER_SIZE;
+    uint8_t flag = 0;
+    uint64_t offset;
+    while (!flag)
+    {
+      while (!free_chunk[n])
+      {
+        ++n;
+        if (n >= NUM_SIZES)
+          return NULL;
+      }
+
+      chunk = DLIST_POP(&free_chunk[n], free);
+      size2 = memory_chunk_size(chunk);
+      uint64_t addr = ((uint64_t)chunk + HEADER_SIZE);
+      offset = page_align_offset(addr);
+      if (offset == 0 || (((offset + size) <= size2) && (offset >= sizeof(Chunk))))
+      {
+        flag = 1;
+      }
+      else
+      {
+        DLIST_PUSH(&free_chunk[n], chunk, free);
+      }
+    }
+
+    if (offset != 0)
+    {
+      DLIST_PUSH(&free_chunk[n], chunk, free);
+      Chunk *chunk2 = (Chunk *)(((char *)chunk) + offset);
+      memory_chunk_init(chunk2);
+      dlist_insert_after(&chunk->all, &chunk2->all);
+      len = memory_chunk_size(chunk2);
+      int n = memory_chunk_slot(len);
+      DLIST_PUSH(&free_chunk[n], chunk2, free);
+      mem_meta += HEADER_SIZE;
+      mem_free += len - HEADER_SIZE;
+      chunk = DLIST_POP(&free_chunk[n], free);
+      size2 = memory_chunk_size(chunk2);
+      if ((size + sizeof(Chunk)) <= (size2 - offset))
+      {
+        Chunk *chunk3 = (Chunk *)(((char *)chunk2) + HEADER_SIZE + size);
+        memory_chunk_init(chunk3);
+        dlist_insert_after(&chunk2->all, &chunk3->all);
+        len = memory_chunk_size(chunk3);
+        int n = memory_chunk_slot(len);
+        DLIST_PUSH(&free_chunk[n], chunk3, free);
+        mem_meta += HEADER_SIZE;
+        mem_free += len - HEADER_SIZE;
+      }
+    }
+    else if (offset == 0 && (size + sizeof(Chunk) <= size2))
+    {
+      Chunk *chunk2 = (Chunk *)(((char *)chunk) + HEADER_SIZE + size);
+      memory_chunk_init(chunk2);
+      dlist_insert_after(&chunk->all, &chunk2->all);
+      len = memory_chunk_size(chunk2);
+      int n = memory_chunk_slot(len);
+      DLIST_PUSH(&free_chunk[n], chunk2, free);
+      mem_meta += HEADER_SIZE;
+      mem_free += len - HEADER_SIZE;
+    }
   }
 
   chunk->used = 1;
   mem_free -= size2;
   mem_used += size2 - len - HEADER_SIZE;
   return chunk->data;
+}
+
+uint64_t page_align_offset(uint64_t addr)
+{
+  if ((addr & 0xFFF) == 0)
+  {
+    return 0;
+  }
+  uint64_t aligned = addr & PAGE_ALIGN;
+  aligned += 0x1000;
+  return (aligned - addr);
 }
 
 void remove_free(Chunk *chunk)
@@ -159,37 +240,27 @@ void free(void *mem)
 uint64_t kmalloc(uint64_t sz)
 {
   uint64_t tmp = malloc(sz, 0);
+  write(hexToString(tmp));
+  write("\n");
+  write(hexToString(getPhysicalKernelOffset((uint64_t)tmp)));
+  write("\n");
   uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp), sz);
   return v_addr;
 }
 
 uint64_t kmalloc_a(uint64_t sz, int align)
 {
-  if (align == 1 && (placement_address & 0xFFFFF000)) // If the address is not already page-aligned
-  {
-    // Align it.
-    placement_address &= 0xFFFFF000;
-    placement_address += 0x1000;
-  }
-  uint64_t tmp = placement_address;
-  placement_address += sz;
+  uint64_t tmp = malloc(sz, 1);
   uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp), sz);
   return v_addr;
 }
 
 uint64_t kmalloc_ap(uint64_t sz, int align, uint64_t *phys)
 {
-  if (align == 1 && (placement_address & 0xFFFFF000)) // If the address is not already page-aligned
-  {
-    // Align it.
-    placement_address &= 0xFFFFF000;
-    placement_address += 0x1000;
-  }
+  uint64_t tmp = malloc(sz, align);
   if (phys)
   {
-    *phys = getPhysicalKernelOffset(placement_address);
+    *phys = getPhysicalKernelOffset(tmp);
   }
-  uint32_t tmp = placement_address;
-  placement_address += sz;
   return tmp;
 }

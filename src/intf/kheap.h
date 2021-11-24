@@ -7,10 +7,10 @@ typedef struct Chunk Chunk;
 struct Chunk
 {
     DList all;
-    int used;
+    uint64_t used;
     union
     {
-        char data[0];
+        char* data;
         DList free;
     };
 };
@@ -30,3 +30,4 @@ uint64_t kmalloc(uint64_t sz);
 uint64_t kmalloc_a(uint64_t sz, int align);
 uint64_t kmalloc_ap(uint64_t sz, int align, uint64_t *phys);
 void init_kheap();
+uint64_t page_align_offset(uint64_t addr);

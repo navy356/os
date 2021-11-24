@@ -97,6 +97,7 @@ uint64_t mapPage(uint64_t physical_addr, uint64_t size)
     }
 
     uint64_t virtual_addr = virtual_addr_start;
+    virtual_addr = virtual_addr+(physical_addr & OFFSET_4_MASK_PHYSICAL);
 
     while (pages_needed > 0)
     {

@@ -18,12 +18,17 @@ void kernel_main()
     move_cursor(0,0);
     print_clear();
     write("I work");
-    uint64_t a = malloc(0x8,1);
-    uint64_t b = malloc(0x8,1);
+    write("\n");
+    uint64_t a = kmalloc(0x100);
     write(hexToString(a));
+    write("\n");
+    uint64_t b = kmalloc(0x10);
     write(hexToString(b));
+    write("\n");
     free(a);
-    write(hexToString(malloc(0x8+0x8,1)));
+    uint64_t c = malloc(0x10,1);
+    write(hexToString(c));
+    write("\n");
     asm("hlt");
 
     /*kfree(c);
