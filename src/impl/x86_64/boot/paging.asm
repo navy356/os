@@ -50,6 +50,11 @@ enable_paging_edit:
 	sub eax, kernel_offset
 	mov cr3, eax
 
+	EnableA20:
+	in al, 0x92
+	or al, 2
+	out 0x92, al
+
 	ret
 
 bits 64

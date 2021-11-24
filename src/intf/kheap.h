@@ -15,11 +15,12 @@ struct Chunk
     };
 };
 
-#define NUM_SIZES 64
+#define NUM_SIZES 32
 #define ALIGN 4
 #define PAGE_ALIGN 0xFFFFFFFFFFFFF000
 #define MIN_SIZE sizeof(DList)
 #define HEADER_SIZE OFFSETOF(Chunk, data)
+#define SIZE 0x2000
 
 void free(void *mem);
 void *malloc(size_t size,int align);
@@ -31,3 +32,4 @@ uint64_t kmalloc_a(uint64_t sz, int align);
 uint64_t kmalloc_ap(uint64_t sz, int align, uint64_t *phys);
 void init_kheap();
 uint64_t page_align_offset(uint64_t addr);
+void kfree(void * addr);

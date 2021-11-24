@@ -15,7 +15,7 @@ Chunk *last = NULL;
 void init_kheap()
 {
   placement_address = kernel_end_virtual + 1;
-  init_memory((void *)placement_address, 0x1000000);
+  init_memory((void *)placement_address, 0x3000000);
 }
 
 static void memory_chunk_init(Chunk *chunk)
@@ -87,7 +87,9 @@ void *malloc(size_t size, int align)
     {
       ++n;
       if (n >= NUM_SIZES)
+      {
         return NULL;
+      }
     }
 
     chunk = DLIST_POP(&free_chunk[n], free);
@@ -116,7 +118,9 @@ void *malloc(size_t size, int align)
       {
         ++n;
         if (n >= NUM_SIZES)
+        {
           return NULL;
+        }
       }
 
       chunk = DLIST_POP(&free_chunk[n], free);
@@ -130,6 +134,11 @@ void *malloc(size_t size, int align)
       else
       {
         DLIST_PUSH(&free_chunk[n], chunk, free);
+        ++n;
+        if (n >= NUM_SIZES)
+        {
+          return NULL;
+        }
       }
     }
 
@@ -240,13 +249,17 @@ void free(void *mem)
 uint64_t kmalloc(uint64_t sz)
 {
   uint64_t tmp = malloc(sz, 0);
+  if(tmp==NULL)
+    return NULL;
   uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp), sz);
   return v_addr;
 }
 
 uint64_t kmalloc_a(uint64_t sz, int align)
 {
-  uint64_t tmp = malloc(sz, 1);
+  uint64_t tmp = malloc(sz, align);
+  if(tmp==NULL)
+    return NULL;
   uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp), sz);
   return v_addr;
 }
@@ -254,9 +267,16 @@ uint64_t kmalloc_a(uint64_t sz, int align)
 uint64_t kmalloc_ap(uint64_t sz, int align, uint64_t *phys)
 {
   uint64_t tmp = malloc(sz, align);
+  if(tmp==NULL)
+    return NULL;
   if (phys)
   {
     *phys = getPhysicalKernelOffset(tmp);
   }
   return tmp;
+}
+
+void kfree(void * addr)
+{
+  free((void *)getPhysical((uint64_t)addr));
 }

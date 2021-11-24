@@ -32,9 +32,9 @@
 00000000000i[      ]   Sound support: no
 00000000000i[      ]   USB support: UHCI
 00000000000i[      ]   VGA extension support: vbe
-00000000000i[MEM0  ] allocated memory at 0x7f91dd152010. after alignment, vector=0x7f91dd153000
-00000000000i[MEM0  ] 32.00MB
-00000000000i[MEM0  ] mem block size = 0x00020000, blocks=256
+00000000000i[MEM0  ] allocated memory at 0x7f384f53e010. after alignment, vector=0x7f384f53f000
+00000000000i[MEM0  ] 64.00MB
+00000000000i[MEM0  ] mem block size = 0x00020000, blocks=512
 00000000000i[MEM0  ] rom at 0xfffe0000/131072 ('/usr/share/bochs/BIOS-bochs-latest')
 00000000000i[CPU0  ] WARNING: 3DNow! is not implemented yet !
 00000000000i[PLUGIN] init_dev of 'pci' plugin device by virtual method
@@ -43,7 +43,7 @@
 00000000000i[DEV   ] PIIX3 PCI-to-ISA bridge present at device 1, function 0
 00000000000i[PLUGIN] init_dev of 'cmos' plugin device by virtual method
 00000000000i[CMOS  ] Using local time for initial clock
-00000000000i[CMOS  ] Setting initial clock to: Thu Nov 25 00:42:17 2021 (time0=1637781137)
+00000000000i[CMOS  ] Setting initial clock to: Thu Nov 25 02:27:05 2021 (time0=1637787425)
 00000000000i[PLUGIN] init_dev of 'dma' plugin device by virtual method
 00000000000i[DMA   ] channel 4 used by cascade
 00000000000i[PLUGIN] init_dev of 'pic' plugin device by virtual method
@@ -188,8 +188,8 @@
 00000317062i[KBD   ] reset-disable command received
 00000318319i[BIOS  ] Starting rombios32
 00000318757i[BIOS  ] Shutdown flag 0
-00000319347i[BIOS  ] ram_size=0x02000000
-00000319769i[BIOS  ] ram_end=32MB
+00000319347i[BIOS  ] ram_size=0x04000000
+00000319769i[BIOS  ] ram_end=64MB
 00000331835i[BIOS  ] Found 1 cpu(s)
 00000345487i[BIOS  ] bios_table_addr: 0x000f9db8 end=0x000fcc00
 00000673308i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
@@ -219,14 +219,14 @@
 00001354441i[PCI   ] setting SMRAM control register to 0x0a
 00001381157i[BIOS  ] MP table addr=0x000f9e90 MPC table addr=0x000f9dc0 size=0xc8
 00001383028i[BIOS  ] SMBIOS table addr=0x000f9ea0
-00001385214i[BIOS  ] ACPI tables: RSDP addr=0x000f9fd0 ACPI DATA addr=0x01ff0000 size=0xff8
-00001388461i[BIOS  ] Firmware waking vector 0x1ff00cc
+00001385214i[BIOS  ] ACPI tables: RSDP addr=0x000f9fd0 ACPI DATA addr=0x03ff0000 size=0xff8
+00001388461i[BIOS  ] Firmware waking vector 0x3ff00cc
 00001390941i[PCI   ] i440FX PMC write to PAM register 59 (TLB Flush)
 00001391664i[BIOS  ] bios_table_cur_addr: 0x000f9ff4
 00001520535i[VBIOS ] VGABios $Id: vgabios.c 226 2020-01-02 21:36:23Z vruppert $
 00001520606i[BXVGA ] VBE known Display Interface b0c0
 00001520638i[BXVGA ] VBE known Display Interface b0c5
 00001523281i[VBIOS ] VBE Bios $Id: vbe.c 228 2020-01-02 23:09:02Z vruppert $
-00005308150i[BIOS  ] IDE time out
-00801102870i[BIOS  ] Booting from 07c0:0000
-01879938000i[      ] Ctrl-C detected in signal handler.
+00005308127i[BIOS  ] IDE time out
+01133031347i[BIOS  ] Booting from 07c0:0000
+02679211000i[      ] Ctrl-C detected in signal handler.
