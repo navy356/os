@@ -69,14 +69,7 @@ void init_memory(void *mem, size_t size)
 
 void *malloc(size_t size, int align)
 {
-  if(!align)
-  {
-    size = (size + ALIGN - 1) & (~(ALIGN - 1));
-  }
-  else
-  {
-    size = (size & PAGE_ALIGN)+(~PAGE_ALIGN+1);
-  }
+  size = (size + ALIGN - 1) & (~(ALIGN - 1));
   if (size < MIN_SIZE)
     size = MIN_SIZE;
 

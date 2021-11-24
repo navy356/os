@@ -15,7 +15,7 @@ struct Chunk
     };
 };
 
-#define NUM_SIZES 32
+#define NUM_SIZES 64
 #define ALIGN 4
 #define PAGE_ALIGN 0xFFFFFFFFFFFFF000
 #define MIN_SIZE sizeof(DList)

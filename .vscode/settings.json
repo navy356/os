@@ -16,6 +16,17 @@
         "initializer_list": "cpp",
         "utility": "cpp",
         "valarray": "cpp",
-        "kheap.h": "c"
+        "kheap.h": "c",
+        "string": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "functional": "cpp",
+        "typeinfo": "cpp",
+        "*.inc": "cpp",
+        "condition_variable": "cpp",
+        "tuple": "cpp"
     }
 }
