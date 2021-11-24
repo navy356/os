@@ -6,12 +6,25 @@
 #include "constants.h"
 
 extern struct IDT _idt[256];
-extern uint64_t isr1;
+
 extern void LoadIDT();
+
+isr_t interrupt_handlers[256];
+
+void register_interrupt_handler(uint8_t n, isr_t handler)
+{
+    interrupt_handlers[n] = handler;
+}
 
 void init_idt()
 {
-    setIdtVal(1,((uint64_t)&isr1 & 0xffffffffffffffff),0,0x08,0x8e);
+    for(int i=0; i<256; i++)
+    {
+        interrupt_handlers[i]=0;
+    }
+    setIdtVal(1,((uint64_t)&isr1& 0xffffffffffffffff),0,0x08,0x8e);
+    //setIdtVal(14,((uint64_t)&isr14& 0xffffffffffffffff),0,0x08,0x8e);
+    register_interrupt_handler(1,isr1_handler);
 
     PIC_remap(0,8);
 
@@ -37,6 +50,37 @@ void isr1_handler()
     outb(0x20,0x20);
     outb(0xa0,0x20);
 }
+
+void isr_handler(registers_t regs)
+{
+    if (interrupt_handlers[regs.int_no] != 0)
+    {
+        isr_t handler = interrupt_handlers[regs.int_no];
+        handler(regs);
+    }
+    else
+    {
+        write(hexToString(regs.int_no));
+        write('\n');
+    }
+}
+
+void irq_handler(registers_t regs)
+{
+    write("irq handler");
+    if (regs.int_no >= 40)
+    {
+        outb(0xA0, 0x20);
+    }
+    outb(0x20, 0x20);
+
+    if (interrupt_handlers[regs.int_no] != 0)
+    {
+        isr_t handler = interrupt_handlers[regs.int_no];
+        handler(regs);
+    }
+}
+
 
 void setIdtVal(int i,uint64_t offset, uint8_t ist, uint16_t offset_selector,uint8_t types_attr)
 {

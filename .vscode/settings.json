@@ -27,6 +27,7 @@
         "typeinfo": "cpp",
         "*.inc": "cpp",
         "condition_variable": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "io_asm.h": "c"
     }
 }
