@@ -32,7 +32,7 @@
 00000000000i[      ]   Sound support: no
 00000000000i[      ]   USB support: UHCI
 00000000000i[      ]   VGA extension support: vbe
-00000000000i[MEM0  ] allocated memory at 0x7fe91d6be010. after alignment, vector=0x7fe91d6bf000
+00000000000i[MEM0  ] allocated memory at 0x7fe0fdee0010. after alignment, vector=0x7fe0fdee1000
 00000000000i[MEM0  ] 32.00MB
 00000000000i[MEM0  ] mem block size = 0x00020000, blocks=256
 00000000000i[MEM0  ] rom at 0xfffe0000/131072 ('/usr/share/bochs/BIOS-bochs-latest')
