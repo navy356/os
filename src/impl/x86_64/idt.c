@@ -64,7 +64,6 @@ void init_idt()
 
     PIC_remap(0x20,0x28);
     LoadIDT();
-    asm("hlt");
 }
 
 void isr1_handler()

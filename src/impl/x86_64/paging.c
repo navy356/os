@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "utility.h"
 #include "kheap.h"
+#include "idt.h"
 
 void init_paging()
 {
@@ -160,10 +161,11 @@ uint64_t setPhysicalFrame(uint64_t *page_table, uint16_t offset)
     return physical;
 }
 
-void page_fault()
+void page_fault(registers_t regs)
 {
     // A page fault has occurred.
 
     // Output an error message.
     write("Page fault! :( ");
+    asm("hlt");
 }
