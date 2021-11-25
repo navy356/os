@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "utility.h"
 #include "kheap.h"
+
 void init_paging()
 {
     virtual_addr_start = 0x0000008000000000;

@@ -4,6 +4,7 @@
 #include "print.h"
 #include "pic.h"
 #include "constants.h"
+#include "paging.h"
 
 extern struct IDT _idt[256];
 
@@ -59,21 +60,9 @@ void init_idt()
 
     //setIdtVal(14,((uint64_t)&isr14& 0xffffffffffffffff),0,0x08,0x8e);
     register_interrupt_handler(33, isr1_handler);
+    register_interrupt_handler(14, page_fault);
 
-    //PIC_remap(0,8);
-
-    //outb(0x21,0xfd);
-    //outb(0xa1,0xff);
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);
+    PIC_remap(0x20,0x28);
     LoadIDT();
     asm("hlt");
 }
