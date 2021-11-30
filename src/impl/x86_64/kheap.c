@@ -4,6 +4,7 @@
 #include "print.h"
 #include "string.h"
 #include "io.h"
+#include "modules.h"
 
 Chunk *free_chunk[NUM_SIZES] = {NULL};
 size_t mem_free = 0;
@@ -14,7 +15,7 @@ Chunk *last = NULL;
 
 void init_kheap()
 {
-  placement_address = kernel_end_virtual + 1;
+  placement_address = findEndModule() + KERNEL_OFFSET + 1;
   init_memory((void *)placement_address, 0x3000000);
 }
 

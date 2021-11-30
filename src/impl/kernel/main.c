@@ -4,6 +4,7 @@
 #include "paging.h"
 #include "constants.h"
 #include "kheap.h"
+#include "modules.h"
 
 struct Char
 {
@@ -13,10 +14,21 @@ struct Char
 
 void kernel_main()
 {
+    struct multiboot_tag *tag;
+    void * module;
+    if (magic != MULTIBOOT2_BOOTLOADER_MAGIC)
+    {
+        asm("hlt");
+    }
     init();
     print_set_color(PRINT_COLOR_YELLOW, PRINT_COLOR_BLACK);
-    move_cursor(0,0);
+    move_cursor(0, 0);
     print_clear();
-    uint64_t *ptr = (uint64_t*)0xA0000000;
-    uint64_t do_page_fault = *ptr;
+    unsigned long addr = (unsigned long)multiboot_ptr+KERNEL_OFFSET;
+    if (addr & 7)
+    {
+        asm("hlt");
+    }
+    
+    write("Done\n");
 }
