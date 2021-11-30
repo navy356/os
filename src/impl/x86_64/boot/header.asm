@@ -1,3 +1,5 @@
+global header_start
+global header_end
 section .multiboot_header
 header_start:
 	; magic number

@@ -28,6 +28,8 @@
         "*.inc": "cpp",
         "condition_variable": "cpp",
         "tuple": "cpp",
-        "io_asm.h": "c"
+        "io_asm.h": "c",
+        "*.tcc": "c",
+        "multiboot.h": "c"
     }
 }
