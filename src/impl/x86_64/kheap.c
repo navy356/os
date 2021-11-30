@@ -248,27 +248,27 @@ void free(void *mem)
 
 uint64_t kmalloc(uint64_t sz)
 {
-  uint64_t tmp = malloc(sz, 0);
-  if(tmp==NULL)
-    return NULL;
+  uint64_t tmp = (uint64_t)malloc(sz, 0);
+  if(tmp==(uint64_t)NULL)
+    return (uint64_t)NULL;
   uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp), sz);
   return v_addr;
 }
 
 uint64_t kmalloc_a(uint64_t sz, int align)
 {
-  uint64_t tmp = malloc(sz, align);
-  if(tmp==NULL)
-    return NULL;
+  uint64_t tmp = (uint64_t)malloc(sz, align);
+  if(tmp==(uint64_t)NULL)
+    return (uint64_t)NULL;
   uint64_t v_addr = mapPage(getPhysicalKernelOffset(tmp), sz);
   return v_addr;
 }
 
 uint64_t kmalloc_ap(uint64_t sz, int align, uint64_t *phys)
 {
-  uint64_t tmp = malloc(sz, align);
-  if(tmp==NULL)
-    return NULL;
+  uint64_t tmp = (uint64_t)malloc(sz, align);
+  if(tmp==(uint64_t)NULL)
+    return (uint64_t)NULL;
   if (phys)
   {
     *phys = getPhysicalKernelOffset(tmp);
