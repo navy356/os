@@ -1,6 +1,7 @@
     bits 64
+start:
     mov rax, 0xDEADBEEF
-
-    ; enter infinite loop, nothing more to do
-    ; $ means "beginning of line", ie. the same instruction
-    jmp $
+    add rdi, loop
+    add rdi, 0x40000000
+loop:
+    jmp rdi

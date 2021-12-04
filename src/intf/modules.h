@@ -4,3 +4,4 @@
 int countModules();
 int findEndModule();
 void callModule(void * module);
+void * findModule();

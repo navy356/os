@@ -12,6 +12,7 @@
 #define FB_HIGH_BYTE_COMMAND 14
 #define FB_LOW_BYTE_COMMAND 15
 
+int inbuf_ptr;
 struct Cursor cursor;
 
 struct Cursor *cursor_ptr;
@@ -21,6 +22,46 @@ void init_io()
     cursor_ptr = &cursor;
     cursor_ptr->x = 0;
     cursor_ptr->y = 0;
+    inbuf_ptr = -1;
+}
+
+void gotInput(char c)
+{
+    if (inbuf_ptr >= (MAX_BUFFER_SIZE - 1))
+    {
+        return;
+    }
+    else
+    {
+        inbuf_ptr++;
+        inbuf[inbuf_ptr] = c;
+    }
+    writec(c);
+}
+
+char sendInput()
+{
+    if(inbuf_ptr<0)
+    {
+        return '\0';
+    }
+    if (inbuf_ptr >= 0)
+    {
+        char c = inbuf[inbuf_ptr];
+        inbuf_ptr--;
+        return c;
+    }
+    return '\0';
+}
+
+char getc()
+{
+    char c = sendInput();
+    while (c == '\0')
+    {
+        c = sendInput();
+    }
+    return c;
 }
 
 /** move_cursor:
@@ -81,6 +122,38 @@ int write(char *buf)
     move_cursor(cursor_ptr->x, cursor_ptr->y);
 }
 
+int writec(char c)
+{
+    print_charAt(c, cursor_ptr->x, cursor_ptr->y);
+    if (cursor_ptr->x == 24 && cursor_ptr->y == 79)
+    {
+        print_newlineFor(cursor_ptr->x, cursor_ptr->y);
+    }
+    if (c == '\n')
+    {
+        if (cursor_ptr->x < NUM_ROWS - 1)
+        {
+            cursor_ptr->x = cursor_ptr->x + 1;
+        }
+        cursor_ptr->y = 0;
+    }
+    else
+    {
+        cursor_ptr->y = cursor_ptr->y + 1;
+    }
+    if (cursor_ptr->y >= NUM_COLS)
+    {
+        cursor_ptr->x = cursor_ptr->x + 1;
+        if (cursor_ptr->x >= NUM_ROWS)
+        {
+            cursor_ptr->x = NUM_ROWS - 1;
+        }
+        cursor_ptr->y = 0;
+    }
+
+    move_cursor(cursor_ptr->x, cursor_ptr->y);
+}
+
 void keyboard_driver(char scanCode)
 {
     int keydown = 1;
@@ -91,14 +164,22 @@ void keyboard_driver(char scanCode)
     }
 
     uint16_t c = _kkybrd_scancode_std[scanCode];
-    if(controlKey(c,keydown))
+    if (controlKey(c, keydown))
     {
         return;
     }
-    
-    if(keydown && (c>>8)==0)
+
+    if (keydown && (c >> 8) == 0)
     {
-        print_char((char)c);
+        if(c==KEY_RETURN)
+        {
+            gotInput('\n');
+        }
+        else
+        {
+            gotInput((char)c);
+        }
+        //print_char((char)c);
     }
 }
 
@@ -118,7 +199,7 @@ int controlKey(uint16_t c, int keydown)
         }
         return 1;
     case KEY_CAPSLOCK:
-        if(!keydown)
+        if (!keydown)
         {
             mod_keys = ~mod_keys;
         }

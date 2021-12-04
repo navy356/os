@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "kheap.h"
 #include "modules.h"
+#include "terminal.h"
 
 struct Char
 {
@@ -29,6 +30,10 @@ void kernel_main()
     {
         asm("hlt");
     }
+
+    module=findModule();
+    write(hexToString(module));
+    callModule(module);
     
-    write("Done\n");
+    //startTerminal();
 }
