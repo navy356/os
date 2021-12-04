@@ -1,5 +1,7 @@
 global start
 global page_table_4
+global multiboot_ptr
+global magic
 extern _start
 
 extern kernel_offset
@@ -7,6 +9,13 @@ extern kernel_offset
 section .multiboot.text
 start:
 bits 32
+mov ecx, magic
+sub ecx, kernel_offset
+mov [ecx],eax
+mov ecx, multiboot_ptr
+sub ecx, kernel_offset
+mov [ecx],ebx
+
 setup_page_tables:
 	mov eax,page_table_3
 	sub eax, kernel_offset
@@ -93,6 +102,7 @@ enable_paging:
 
 section .bss
 align 4096
+
 page_table_4:
 	resb 4096
 page_table_3:
@@ -101,3 +111,8 @@ page_table_2:
 	resb 4096
 page_table_2_2:
 	resb 4096
+
+magic:
+	resb 8
+multiboot_ptr:
+    resb 8

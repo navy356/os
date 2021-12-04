@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "multiboot.h"
 
 #ifndef KEYCODES
 #define KEYCODES
@@ -15,7 +16,10 @@
 #define KERNEL_OFFSET 0x40000000
 #define MAPPED_END 0x00003fdfffff
 
+extern void * multiboot_ptr;
+extern unsigned long magic;
 extern uint64_t kernel_end_virtual;
+//extern multiboot_info_t *multiboot_ptr;
 /* The modifier keys currently pressed */
 static unsigned char mod_keys = 0;
 /* Keycode definitions. */

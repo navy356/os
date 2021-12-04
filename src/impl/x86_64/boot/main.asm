@@ -1,4 +1,5 @@
 global _start
+global multiboot_ptr
 global placement_address
 extern Start64Bit
 extern check_multiboot
